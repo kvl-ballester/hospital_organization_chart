@@ -4,10 +4,12 @@ const departmentSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   staff: {
     type: [{
-        fullname: {type: String, required: true}
+      _id: mongoose.Schema.Types.ObjectId,
+      fullname: String
     }],
     required: true,
   },
