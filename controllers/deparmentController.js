@@ -14,6 +14,7 @@ departmentController = {
             })
 
             const savedDoc = await departmentDoc.save()
+            console.log(new Date(Date.now()).toLocaleString() + ' Department created: name = ' + req.body.name + ', id = ' + savedDoc._id)
             res.json(savedDoc)
 
         } catch (error) {
