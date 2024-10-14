@@ -49,7 +49,7 @@ async function createStuff(departments) {
             )
 
         } catch (error) {
-            console.log('create Stuff error ' + error)
+            console.log('createStuff error: ' + error)
         }
     }
 }
