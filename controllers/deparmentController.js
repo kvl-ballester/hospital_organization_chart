@@ -5,7 +5,8 @@ const Employee = require('../models/employee')
 departmentController = {
 
     createDepartment: async (req, res) => {
-        
+        console.log(new Date(Date.now()).toLocaleString() + ' createDepartment: name = ' + req.body.name)
+
         try {
             const departmentDoc = new Department({
                 name: req.body.name,
@@ -49,9 +50,10 @@ departmentController = {
     },
 
     removeDepartment: async (req, res) => {
+        console.log(new Date(Date.now()).toLocaleString() + ' removeDepartment: id = ' + req.params.id)
+
         try {
-            const id =  req.params.id
-            const department = await this.departmentController.getDepartmentById(id)
+            const department = await Department.findById(req.params.id)
             for (const employeeRef of department.staff) {
                 await Employee.updateOne(
                     {_id: employeeRef._id},
@@ -61,7 +63,8 @@ departmentController = {
                 )
             }
 
-            await Department.deleteOne({_id: id})
+            const deletedDoc = await Department.deleteOne({_id: req.params.id})
+            res.json(deletedDoc)
         } catch (error) {
             res.status(400).send(error)
             console.log('removeDepartment Error:')
