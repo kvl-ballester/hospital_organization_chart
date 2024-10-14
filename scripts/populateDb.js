@@ -11,7 +11,7 @@ async function connectTo(uri) {
         await mongoose.connect(uri);
         console.log('Connected to ' + uri)
       } catch (error) {
-        console.log(error);
+        console.log('connectTo error: ' + error);
       }
 }
 
@@ -57,14 +57,15 @@ async function createStuff(departments) {
 
 
 async function main() {
-    const db = await connectTo(process.env.MONGO_DB_URI)
+    await connectTo(process.env.MONGO_DB_URI)
     let departments = await Department.find() 
     if (departments.length == 0) {
         await createDepartments();
         departments = await Department.find() 
     }
 
-    createStuff(departments)
+    await createStuff(departments)
+    mongoose.connection.close()
 
 }
 
