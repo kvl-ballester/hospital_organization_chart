@@ -1,20 +1,17 @@
 const express = require("express");
-const departmentController = require("../controllers/deparmentController");
+const {departmentController} = require("../controllers/deparmentController");
 
 const departmentRouter = express.Router();
 
 // Create Operation
-departmentRouter.post("/", () => console.log('create department'));
+departmentRouter.post("/", departmentController.createDepartment);
 
 // Read operations
-departmentRouter.get("/", () => console.log('get all departments'));
-departmentRouter.get("/:id", () => console.log('get department (staff)'));
-
-// Update operation
-departmentRouter.put("/:id", () => console.log('update staff '));
+departmentRouter.get("/", departmentController.getAllDepartments);
+departmentRouter.get("/:id", departmentController.getDepartmentById);
 
 // Delete operation
-departmentRouter.delete("/:id", () => console.log('remove department from db'));
+departmentRouter.delete("/:id", departmentController.removeDepartment);
 
 
 
