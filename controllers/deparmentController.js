@@ -1,11 +1,11 @@
 const Department = require('../models/department')
 const Employee = require('../models/employee')
-
+const {logAPICall} = require('../helpers/helpers')
 
 departmentController = {
 
     createDepartment: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' createDepartment: name = ' + req.body.name)
+        logAPICall(req, departmentController.createDepartment.name)
 
         try {
             const departmentDoc = new Department({
@@ -23,18 +23,17 @@ departmentController = {
             console.log(error)
         }
         
-
-
     },
 
     getAllDepartments: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' getAllDepartments')
+        logAPICall(req, departmentController.getAllDepartments.name)
         const departments = await Department.find()
         res.json(departments)
     },
 
     getDepartmentById: async (req,res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' getDepartmentById: id = ' + req.params.id)
+        logAPICall(req, departmentController.getDepartmentById.name)
+        
         try {
             const department = await Department.findById(req.params.id)
 
@@ -51,7 +50,7 @@ departmentController = {
     },
 
     removeDepartment: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' removeDepartment: id = ' + req.params.id)
+        logAPICall(req, departmentController.removeDepartment.name)
 
         try {
             const department = await Department.findById(req.params.id)
@@ -78,7 +77,8 @@ departmentController = {
 }
 
 async function addEmployeeToDepartment(employee) {
-    console.log(new Date(Date.now()).toLocaleString() + ' addEmployeeToDepartment')
+    console.log(new Date(Date.now()).toLocaleString(), '@' + addEmployeeToDepartment.name)
+    
     try {
         await Department.updateOne(
             {name: employee.department},
@@ -97,7 +97,8 @@ async function addEmployeeToDepartment(employee) {
 }
 
 async function removeEmployeeFromDepartment(employee) {
-    console.log(new Date(Date.now()).toLocaleString() + ' removeEmployeeFromDepartment')
+    console.log(new Date(Date.now()).toLocaleString(), '@' + removeEmployeeFromDepartment.name)
+    
     try {
         await Department.updateOne(
             {name: employee.department},

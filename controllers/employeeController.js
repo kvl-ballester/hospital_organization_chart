@@ -1,10 +1,12 @@
+const { logAPICall } = require('../helpers/helpers')
 const Employee = require('../models/employee')
 const {addEmployeeToDepartment, removeEmployeeFromDepartment} =  require('./deparmentController')
+
+
 employeeController = {
 
     createEmployee: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' createEmployee: name = ' + req.body.name 
-        + ', surname = ' + req.body.surname + ', department = ' + req.body.department)
+        logAPICall(req, employeeController.createEmployee.name)
 
         const employee =  new Employee({
             name: req.body.name,
@@ -25,7 +27,7 @@ employeeController = {
     },
 
     getAllEmployees: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' getAllEmployees')
+        logAPICall(req, employeeController.getAllEmployees.name)
 
         try {
             const employees = await Employee.find()
@@ -37,7 +39,7 @@ employeeController = {
     },
 
     getEmployeeById: async (req,res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' getEmployeeById: id = ' + req.params.id)
+        logAPICall(req, employeeController.getEmployeeById.name)
         try {
             const employee = await Employee.findById(req.params.id)
 
@@ -52,7 +54,7 @@ employeeController = {
     },
 
     updateEmployee: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' updateEmployee: id = ' + req.params.id)
+        logAPICall(req, employeeController.updateEmployee.name)
         
         const data = req.body
         data._id = req.params.id
@@ -68,7 +70,7 @@ employeeController = {
     },
 
     removeEmployee: async (req, res) => {
-        console.log(new Date(Date.now()).toLocaleString() + ' removeEmployee: id = ' + req.params.id)
+        logAPICall(req, employeeController.removeEmployee.name)
 
         try {
             const employee = await Employee.findById(req.params.id)
