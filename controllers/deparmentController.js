@@ -78,7 +78,7 @@ departmentController = {
 }
 
 async function addEmployeeToDepartment(employee) {
-
+    console.log(new Date(Date.now()).toLocaleString() + ' addEmployeeToDepartment')
     try {
         await Department.updateOne(
             {name: employee.department},
@@ -96,13 +96,14 @@ async function addEmployeeToDepartment(employee) {
     
 }
 
-async function removeEmployeeFromDepartment(departmentName, idEmployee) {
+async function removeEmployeeFromDepartment(employee) {
+    console.log(new Date(Date.now()).toLocaleString() + ' removeEmployeeFromDepartment')
     try {
         await Department.updateOne(
-            {name: departmentName},
+            {name: employee.department},
             {$pull:
                 {
-                    staff: {_id: idEmployee}
+                    staff: {_id: employee._id}
                 }
             }
         )
