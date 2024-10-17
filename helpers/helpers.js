@@ -16,8 +16,17 @@ function printObjectInLine(obj, name) {
     return msg
 }
 
+function objectsArrayToString(array) {
+    let msg = ''
+    for (const obj of array) {
+        msg += JSON.stringify(obj) + ', '
+    }
+
+    return msg.slice(0, -2)
+}
+
 function logAPICall(req, controllerName) {
-    console.log(localTime(), req.method, 'v'+req.httpVersion ,req.baseUrl + req.url, '@' + controllerName)
+    console.log('[api_server]',localTime(), req.method, 'v'+req.httpVersion ,req.baseUrl + req.url, '@' + controllerName)
     if (!isObjectEmpty(req.params)) {
         console.log(printObjectInLine(req.params, 'params'))
     }
@@ -28,4 +37,8 @@ function logAPICall(req, controllerName) {
 
 }
 
-module.exports = {logAPICall}
+function logMongoose(collectionName, methodName, ...methodArgs) {
+    console.log(`[mongoose] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
+}
+
+module.exports = {logAPICall, logMongoose}

@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const { logMongoose } = require("../helpers/helpers");
+
+mongoose.set('debug', logMongoose);
 
 const connectDB = async () => {
   try {
