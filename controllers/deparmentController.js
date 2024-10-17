@@ -1,6 +1,7 @@
 const Department = require('../models/department')
 const Employee = require('../models/employee')
-const {logAPICall} = require('../helpers/helpers')
+const {logAPICall, logPrivateFunction} = require('../helpers/helpers')
+const CustomError = require('../helpers/customErrorClass')
 
 departmentController = {
 
@@ -37,15 +38,12 @@ departmentController = {
         try {
             const department = await Department.findById(req.params.id)
 
-            if (department == null) throw new Error("Department not found")
-                            
+            if (department == null) throw new CustomError('Department not found', 404)
             res.json(department)
 
         } catch (error) {
-        
-            res.status(400).send(error)
-            console.log('getDepartmentById Error:')
-            console.log(error)
+            console.log(JSON.stringify(error))
+            res.status(error.statusCode || 500).send(error.message)
         }
     },
 
@@ -77,8 +75,8 @@ departmentController = {
 }
 
 async function addEmployeeToDepartment(employee) {
-    console.log(new Date(Date.now()).toLocaleString(), '@' + addEmployeeToDepartment.name)
-    
+    logPrivateFunction(addEmployeeToDepartment.name, employee)
+
     try {
         await Department.updateOne(
             {name: employee.department},
@@ -97,7 +95,7 @@ async function addEmployeeToDepartment(employee) {
 }
 
 async function removeEmployeeFromDepartment(employee) {
-    console.log(new Date(Date.now()).toLocaleString(), '@' + removeEmployeeFromDepartment.name)
+    logPrivateFunction(removeEmployeeFromDepartment.name, employee)
     
     try {
         await Department.updateOne(

@@ -6,15 +6,13 @@ function isObjectEmpty(obj) {
     return Object.keys(obj).length == 0
 }
 
-function printObjectInLine(obj, name) {
-    let msg = name + ': {'
-    for (const key in obj) {
-        msg = msg + key + '=' +obj[key] + ' '
-    }  
-    msg = msg + '}'
-    
-    return msg
+function objectToString(obj, name) {    
+    let msg = name ? `${name} ` : ''
+    msg += JSON.stringify(obj).replaceAll(',',', ')
+    return  msg
 }
+
+
 
 function objectsArrayToString(array) {
     let msg = ''
@@ -28,17 +26,21 @@ function objectsArrayToString(array) {
 function logAPICall(req, controllerName) {
     console.log('[api_server]',localTime(), req.method, 'v'+req.httpVersion ,req.baseUrl + req.url, '@' + controllerName)
     if (!isObjectEmpty(req.params)) {
-        console.log(printObjectInLine(req.params, 'params'))
+        console.log(objectToString(req.params, '[api_server][request][params]'))
     }
 
     if (!isObjectEmpty(req.body)) {
-        console.log(printObjectInLine(req.body, 'body'))
+        console.log(objectToString(req.body, '[api_server][request][body]'))
     }
 
+}
+
+function logPrivateFunction(funcName, ...args) {
+    console.log(`[api_server][${funcName}][args:${args.length}] ${JSON.stringify(args)}`.replaceAll(',',', '))
 }
 
 function logMongoose(collectionName, methodName, ...methodArgs) {
     console.log(`[mongoose] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
 }
 
-module.exports = {logAPICall, logMongoose}
+module.exports = {logAPICall, logMongoose, logPrivateFunction}
