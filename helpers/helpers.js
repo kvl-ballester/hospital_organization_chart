@@ -25,11 +25,11 @@ function objectsArrayToString(array) {
 function logAPICall(req, controllerName) {
     console.log('[api_server]',localTime(), req.method, 'v'+req.httpVersion ,req.baseUrl + req.url, '@' + controllerName)
     if (!isObjectEmpty(req.params)) {
-        console.log(objectToString(req.params, '[api_server][request][params]'))
+        console.log(objectToString(req.params, '[api_server] [request][params]'))
     }
 
     if (!isObjectEmpty(req.body)) {
-        console.log(objectToString(req.body, '[api_server][request][body]'))
+        console.log(objectToString(req.body, '[api_server] [request][body]'))
     }
 
 }
@@ -39,7 +39,7 @@ function logInfo(msg) {
 }
 
 function logPrivateFunction(funcName, ...args) {
-    console.log(`[api_server][${funcName}][args:${args.length}] ${JSON.stringify(args)}`.replaceAll(',',', '))
+    console.log(`[api_server] [${funcName}][args:${args.length}] ${JSON.stringify(args)}`.replaceAll(',',', '))
 }
 
 function logMongoose(collectionName, methodName, ...methodArgs) {
