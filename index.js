@@ -4,6 +4,7 @@ const connectDB = require('./config/db')
 const bodyParser = require('body-parser')
 const employeeRouter = require("./routes/employee");
 const departmentRouter = require("./routes/department");
+const { logInfo } = require("./helpers/helpers");
 
 dotenv.config();
 
@@ -18,5 +19,5 @@ app.use("/api/employee", employeeRouter);
 app.use("/api/department", departmentRouter);
 
 app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+    logInfo(`Server listening at http://localhost:${port}`)
   });
