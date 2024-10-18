@@ -13,7 +13,6 @@ function objectToString(obj, name) {
 }
 
 
-
 function objectsArrayToString(array) {
     let msg = ''
     for (const obj of array) {
@@ -35,12 +34,16 @@ function logAPICall(req, controllerName) {
 
 }
 
+function logInfo(msg) {
+    console.log(`[api_server] ${msg}`)
+}
+
 function logPrivateFunction(funcName, ...args) {
     console.log(`[api_server][${funcName}][args:${args.length}] ${JSON.stringify(args)}`.replaceAll(',',', '))
 }
 
 function logMongoose(collectionName, methodName, ...methodArgs) {
-    console.log(`[mongoose] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
+    console.log(`[${'mongoose'.padEnd('api_server'.length)}] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
 }
 
-module.exports = {logAPICall, logMongoose, logPrivateFunction}
+module.exports = {logAPICall, logMongoose, logPrivateFunction, logInfo}
