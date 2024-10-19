@@ -13,9 +13,7 @@ departmentController = {
                 name: req.body.name,
                 staff: []
             })
-
             const savedDoc = await departmentDoc.save()
-            console.log(new Date(Date.now()).toLocaleString() + ' Department created: name = ' + req.body.name + ', id = ' + savedDoc._id)
             res.json(savedDoc)
 
         } catch (error) {
@@ -30,11 +28,11 @@ departmentController = {
         logAPICall(req, departmentController.getAllDepartments.name)
         const departments = await Department.find()
         res.json(departments)
+
     },
 
     getDepartmentById: async (req,res) => {
         logAPICall(req, departmentController.getDepartmentById.name)
-        
         try {
             const department = await Department.findById(req.params.id)
 
@@ -42,32 +40,39 @@ departmentController = {
             res.json(department)
 
         } catch (error) {
-            console.log(JSON.stringify(error))
+            console.log(error)
             res.status(error.statusCode || 500).send(error.message)
         }
     },
 
     removeDepartment: async (req, res) => {
         logAPICall(req, departmentController.removeDepartment.name)
+        const departmentId = req.params.id
 
         try {
-            const department = await Department.findById(req.params.id)
-            for (const employeeRef of department.staff) {
-                await Employee.updateOne(
-                    {_id: employeeRef._id},
-                    {$set:
-                        {department: ''}
-                    }
-                )
+            const department = await Department.findById(departmentId)
+            if (!department) {
+                throw new CustomError(`Department not found for id: ${departmentId}` , 404);
+                
             }
 
-            const deletedDoc = await Department.deleteOne({_id: req.params.id})
-            res.json(deletedDoc)
+            //Update employee model if needed
+            if (department.staff.length != 0) {
+                await removeDepartmentFromEmployee(department.staff)
+            }
+            
+            const infoOp = await Department.deleteOne({_id: departmentId})
+            if (infoOp.deletedCount != 1) {
+                throw new Error("An error ocurred while deleting department");
+            }
+            
+
+            res.sendStatus(200)
         } catch (error) {
-            res.status(400).send(error)
-            console.log('removeDepartment Error:')
+
+            res.status(error.statusCode || 500).send(error.message)
             console.log(error)
-        }
+        } 
     }
 
 
@@ -109,6 +114,32 @@ async function removeEmployeeFromDepartment(employee) {
     } catch (error) {
         console.log('removeEmployeeFromDepartment Error:')
         console.log(error)
+    }
+    
+}
+
+
+async function removeDepartmentFromEmployee(departmentStaff) {
+    logPrivateFunction(removeDepartmentFromEmployee.name, departmentStaff)
+
+    try {
+        
+        //update department field
+        for (const employeeRef of departmentStaff) {
+            let infoOp = await Employee.updateOne(
+                {_id: employeeRef._id},
+                {$set:
+                    {department: ''}
+                }
+            )
+
+            if (infoOp.modifiedCount != 1) {
+                throw new CustomError(`Error updating employee profile from staff, id: ${employeeRef._id}`, 400);
+                
+            }
+        }
+    } catch (error) {
+        throw error
     }
     
 }
