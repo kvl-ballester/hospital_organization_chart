@@ -34,8 +34,20 @@ function logAPICall(req, controllerName) {
 
 }
 
+function isObjectInArray(objId, array) {
+    const res = array.map((employeeInfo) => {employeeInfo._id === objId})
+    if (res.length === 0) return false
+    return true
+}
+
+
+//Log functions
 function logInfo(msg) {
     console.log(`[api_server] ${msg}`)
+}
+
+function logWarning(msg) {
+    console.log(`[api_server] [warning] ${msg}`)
 }
 
 function logPrivateFunction(funcName, ...args) {
@@ -46,4 +58,4 @@ function logMongoose(collectionName, methodName, ...methodArgs) {
     console.log(`[${'mongoose'.padEnd('api_server'.length)}] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
 }
 
-module.exports = {logAPICall, logMongoose, logPrivateFunction, logInfo}
+module.exports = {logAPICall, logMongoose, logPrivateFunction, logInfo, isObjectInArray, logWarning}
