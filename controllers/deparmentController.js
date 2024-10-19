@@ -1,6 +1,6 @@
 const Department = require('../models/department')
 const Employee = require('../models/employee')
-const {logAPICall, logPrivateFunction} = require('../helpers/helpers')
+const {logAPICall, logPrivateFunction, isObjectInArray, logWarning} = require('../helpers/helpers')
 const CustomError = require('../helpers/customErrorClass')
 
 departmentController = {
@@ -17,7 +17,7 @@ departmentController = {
             res.json(savedDoc)
 
         } catch (error) {
-            res.status(400).send(error)
+            res.status(error.statusCode || 500).send(error.message)
             console.log(error)
         }
         
@@ -77,41 +77,74 @@ departmentController = {
 
 }
 
-async function addEmployeeToDepartment(employee) {
-    logPrivateFunction(addEmployeeToDepartment.name, employee)
+async function addEmployeeToDepartmentStaff(employee) {
+    logPrivateFunction(addEmployeeToDepartmentStaff.name, employee)
 
     try {
-        await Department.updateOne(
+
+        const data= {
+            _id: employee._id,
+            fullname: employee.name + ' ' + employee.surname
+        }
+
+        const infoOp = await Department.updateOne(
             {name: employee.department},
             {$push: 
-                {staff: {
-                    _id: employee._id,
-                    fullname: employee.name + ' ' + employee.surname
-                }}
+                {staff: data}
             }
         )
+
+        if (infoOp.matchedCount != 1) {
+            throw new CustomError(`Department ${employee.department} does not exist`, 400);
+            
+        }
+
+        if (infoOp.modifiedCount != 1) {
+            throw new Error(`Could assign employee ${data.fullname} to department ${employee.department}`);
+            
+        }
+
+        return infoOp
     } catch (error) {
-        console.log('addEmployeeToDepartment Error:')
-        console.log(error)
+        throw error
     }
     
 }
 
-async function removeEmployeeFromDepartment(employee) {
-    logPrivateFunction(removeEmployeeFromDepartment.name, employee)
+async function removeEmployeeFromDepartmentStaff(employee) {
+    logPrivateFunction(removeEmployeeFromDepartmentStaff.name, employee)
     
     try {
-        await Department.updateOne(
-            {name: employee.department},
-            {$pull:
-                {
-                    staff: {_id: employee._id}
+        const department = await Department.find({name: employee.department})
+        let res = {}
+
+        if (!department) {
+            logWarning(`No need to remove employee from staff, department ${employee.department} does not exist.`)
+        } else if (!isObjectInArray(employee._id, department.staff)){
+            logWarning(`Employee ${employee._id} is not already in staff from department ${employee.department}`)
+
+        } else {
+
+            const infoOp = await Department.updateOne(
+                {name: employee.department},
+                {$pull:
+                    {
+                        staff: {_id: employee._id}
+                    }
                 }
+            )
+
+            if (infoOp.modifiedCount != 1) {
+                throw new Error(`Could remove employee ${employee._id} from department ${employee.department}`);
             }
-        )
+
+            res = infoOp
+        }
+
+        return res
+
     } catch (error) {
-        console.log('removeEmployeeFromDepartment Error:')
-        console.log(error)
+        throw error
     }
     
 }
@@ -132,7 +165,7 @@ async function removeDepartmentFromEmployee(departmentStaff) {
             )
 
             if (infoOp.modifiedCount != 1) {
-                throw new CustomError(`Error updating employee profile from staff, id: ${employeeRef._id}`, 400);
+                throw new Error(`Error updating employee profile from staff, id: ${employeeRef._id}`);
                 
             }
         }
@@ -144,4 +177,4 @@ async function removeDepartmentFromEmployee(departmentStaff) {
 
 
 
-module.exports = {departmentController, removeEmployeeFromDepartment, addEmployeeToDepartment}
+module.exports = {departmentController, removeEmployeeFromDepartmentStaff, addEmployeeToDepartmentStaff}
