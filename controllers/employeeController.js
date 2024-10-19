@@ -1,6 +1,7 @@
+const CustomError = require('../helpers/customErrorClass')
 const { logAPICall } = require('../helpers/helpers')
 const Employee = require('../models/employee')
-const {addEmployeeToDepartment, removeEmployeeFromDepartment} =  require('./deparmentController')
+const {addEmployeeToDepartmentStaff, removeEmployeeFromDepartmentStaff} =  require('./deparmentController')
 
 
 employeeController = {
@@ -15,13 +16,14 @@ employeeController = {
         })
 
         try {
+            
             const savedDoc = await employee.save()
-            console.log(new Date(Date.now()).toLocaleString() + ' employee created: name = ' + savedDoc.name + ', id = ' + savedDoc._id) 
-            await addEmployeeToDepartment(savedDoc)
+            await addEmployeeToDepartmentStaff(employee)
             res.json(savedDoc)
 
         } catch (error) {
-            console.log('createEmployee error \n', error)
+            res.status(error.statusCode || 500).send(error.message)
+            console.log(error)            
         }
 
     },
@@ -33,7 +35,8 @@ employeeController = {
             const employees = await Employee.find()
             res.json(employees)
         } catch (error) {
-            console.log('getAllEmployees error \n', error)
+            res.status(error.statusCode || 500).send(error.message)
+            console.log(error)    
         }
         
     },
@@ -43,13 +46,12 @@ employeeController = {
         try {
             const employee = await Employee.findById(req.params.id)
 
-            if (employee == null) throw new Error("Employee not found")
-                            
+            if (!employee) throw new CustomError("Employee not found", 404)
             res.json(employee)
 
         } catch (error) {
-            res.status(400).send(error)
-            console.log('getEmployeeById Error: \n',error)
+            res.status(error.statusCode || 500).send(error.message)
+            console.log(error)  
         }
     },
 
@@ -59,14 +61,22 @@ employeeController = {
         const data = req.body
         data._id = req.params.id
 
-        const employee = await Employee.findById(req.params.id)
+        try {
+            const employee = await Employee.findById(req.params.id)
+            if (!employee) throw new CustomError("Employee not found", 404)
+
+            // update departmetns staff
+            await removeEmployeeFromDepartmentStaff(employee)
+            await addEmployeeToDepartmentStaff(data)
+            await updateEmployee(data)
+
+            res.sendStatus(200)
+
+        } catch (error) {
+            res.status(error.statusCode || 500).send(error.message)
+            console.log(error) 
+        }
         
-        // update departmetns staff
-        await removeEmployeeFromDepartment(employee)
-        await addEmployeeToDepartment(data)
-        
-        const updatedDoc = await Employee.updateOne({_id: req.params.id}, data)
-        res.json(updatedDoc)
     },
 
     removeEmployee: async (req, res) => {
@@ -74,17 +84,53 @@ employeeController = {
 
         try {
             const employee = await Employee.findById(req.params.id)
-            
-            const deletedDoc = await Employee.deleteOne({_id: req.params.id})
-            await removeEmployeeFromDepartment(employee)
-            res.json(deletedDoc)
+            if (!employee) throw new CustomError("Employee not found", 404)
+
+            await removeEmployeeFromDepartmentStaff(employee)
+            await deleteEmployee(req.params.id)
+
+            res.sendStatus(200)
         } catch (error) {
-            res.status(400).send(error)
-            console.log('removeDepartment Error:')
-            console.log(error)
+            res.status(error.statusCode || 500).send(error.message)
+            console.log(error) 
         }
     }
 
+}
+
+
+
+async function updateEmployee(data) {
+
+    try {
+        const infoOp = await Employee.updateOne({_id: data.id}, data)
+        if (infoOp.modifiedCount != 1) {
+            throw new Error("Error occured updating employee info");
+            
+        } 
+
+        return infoOp
+
+    } catch (error) {
+        throw error
+    }
+    
+}
+
+async function deleteEmployee(id) {
+    try {
+        const infoOp = await Employee.deleteOne({_id: req.params.id})
+        if (infoOp.deletedCount != 1) {
+            throw new Error("An error ocurred while deleting employee");
+        }
+
+        return infoOp
+
+    } catch (error) {
+        throw error;
+        
+    }
+    
 }
 
 module.exports = {employeeController}
