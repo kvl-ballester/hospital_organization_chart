@@ -18,7 +18,6 @@ departmentController = {
 
         } catch (error) {
             res.status(400).send(error)
-            console.log('createDepartment Error:')
             console.log(error)
         }
         
@@ -36,7 +35,7 @@ departmentController = {
         try {
             const department = await Department.findById(req.params.id)
 
-            if (department == null) throw new CustomError('Department not found', 404)
+            if (!department) throw new CustomError('Department not found', 404)
             res.json(department)
 
         } catch (error) {
@@ -69,7 +68,6 @@ departmentController = {
 
             res.sendStatus(200)
         } catch (error) {
-
             res.status(error.statusCode || 500).send(error.message)
             console.log(error)
         } 
