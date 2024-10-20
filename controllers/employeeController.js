@@ -1,5 +1,6 @@
 const CustomError = require('../helpers/customErrorClass')
-const { logAPICall } = require('../helpers/helpers')
+const { logAPICall, logPrivateFunction } = require('../helpers/helpers')
+const Logger = require('../helpers/logger')
 const Employee = require('../models/employee')
 const {addEmployeeToDepartmentStaff, removeEmployeeFromDepartmentStaff} =  require('./deparmentController')
 
@@ -23,7 +24,7 @@ employeeController = {
 
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error)            
+            Logger.log(error)            
         }
 
     },
@@ -36,7 +37,7 @@ employeeController = {
             res.json(employees)
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error)    
+            Logger.log(error)    
         }
         
     },
@@ -51,7 +52,7 @@ employeeController = {
 
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error)  
+            Logger.log(error)  
         }
     },
 
@@ -74,7 +75,7 @@ employeeController = {
 
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error) 
+            Logger.log(error) 
         }
         
     },
@@ -92,7 +93,7 @@ employeeController = {
             res.sendStatus(200)
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error) 
+            Logger.log(error) 
         }
     }
 
@@ -101,9 +102,10 @@ employeeController = {
 
 
 async function updateEmployee(data) {
+    logPrivateFunction(updateEmployee.name, data)
 
     try {
-        const infoOp = await Employee.updateOne({_id: data.id}, data)
+        const infoOp = await Employee.updateOne({_id: data._id}, data)
         if (infoOp.modifiedCount != 1) {
             throw new Error("Error occured updating employee info");
             
@@ -118,8 +120,10 @@ async function updateEmployee(data) {
 }
 
 async function deleteEmployee(id) {
+    logPrivateFunction(deleteEmployee.name, id)
+
     try {
-        const infoOp = await Employee.deleteOne({_id: req.params.id})
+        const infoOp = await Employee.deleteOne({_id: id})
         if (infoOp.deletedCount != 1) {
             throw new Error("An error ocurred while deleting employee");
         }

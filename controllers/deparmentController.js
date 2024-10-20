@@ -2,6 +2,7 @@ const Department = require('../models/department')
 const Employee = require('../models/employee')
 const {logAPICall, logPrivateFunction, isObjectInArray, logWarning} = require('../helpers/helpers')
 const CustomError = require('../helpers/customErrorClass')
+const Logger = require('../helpers/logger')
 
 departmentController = {
 
@@ -18,7 +19,7 @@ departmentController = {
 
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error)
+            Logger.log(error)
         }
         
     },
@@ -39,7 +40,7 @@ departmentController = {
             res.json(department)
 
         } catch (error) {
-            console.log(error)
+            Logger.log(error)
             res.status(error.statusCode || 500).send(error.message)
         }
     },
@@ -69,7 +70,7 @@ departmentController = {
             res.sendStatus(200)
         } catch (error) {
             res.status(error.statusCode || 500).send(error.message)
-            console.log(error)
+            Logger.log(error)
         } 
     }
 
@@ -115,9 +116,9 @@ async function removeEmployeeFromDepartmentStaff(employee) {
     logPrivateFunction(removeEmployeeFromDepartmentStaff.name, employee)
     
     try {
-        const department = await Department.find({name: employee.department})
+        const [department] = await Department.find({name: employee.department})
         let res = {}
-
+        
         if (!department) {
             logWarning(`No need to remove employee from staff, department ${employee.department} does not exist.`)
         } else if (!isObjectInArray(employee._id, department.staff)){
