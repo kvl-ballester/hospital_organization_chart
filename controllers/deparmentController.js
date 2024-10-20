@@ -78,34 +78,45 @@ departmentController = {
 
 }
 
+
 async function addEmployeeToDepartmentStaff(employee) {
     logPrivateFunction(addEmployeeToDepartmentStaff.name, employee)
 
     try {
 
-        const data= {
-            _id: employee._id,
-            fullname: employee.name + ' ' + employee.surname
-        }
+        const [department] = await Department.find({name: employee.department})
+        let res = {}
 
-        const infoOp = await Department.updateOne(
-            {name: employee.department},
-            {$push: 
-                {staff: data}
+        if (isObjectInArray(employee._id, department.staff)) {
+            logWarning(`Employee ${employee._id} is already in department ${employee.department}.`)
+        } else {
+            const data= {
+                _id: employee._id,
+                fullname: employee.name + ' ' + employee.surname
             }
-        )
+    
+            const infoOp = await Department.updateOne(
+                {name: employee.department},
+                {$push: 
+                    {staff: data}
+                }
+            )
+    
+            if (infoOp.matchedCount != 1) {
+                throw new CustomError(`Department ${employee.department} does not exist`, 400);
+                
+            }
+    
+            if (infoOp.modifiedCount != 1) {
+                throw new Error(`Could assign employee ${data.fullname} to department ${employee.department}`);
+                
+            }
 
-        if (infoOp.matchedCount != 1) {
-            throw new CustomError(`Department ${employee.department} does not exist`, 400);
-            
+            res = infoOp
         }
+        
 
-        if (infoOp.modifiedCount != 1) {
-            throw new Error(`Could assign employee ${data.fullname} to department ${employee.department}`);
-            
-        }
-
-        return infoOp
+        return res
     } catch (error) {
         throw error
     }
@@ -118,7 +129,7 @@ async function removeEmployeeFromDepartmentStaff(employee) {
     try {
         const [department] = await Department.find({name: employee.department})
         let res = {}
-        
+
         if (!department) {
             logWarning(`No need to remove employee from staff, department ${employee.department} does not exist.`)
         } else if (!isObjectInArray(employee._id, department.staff)){

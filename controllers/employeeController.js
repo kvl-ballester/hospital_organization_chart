@@ -1,6 +1,7 @@
 const CustomError = require('../helpers/customErrorClass')
 const { logAPICall, logPrivateFunction } = require('../helpers/helpers')
 const Logger = require('../helpers/logger')
+const Department = require('../models/department')
 const Employee = require('../models/employee')
 const {addEmployeeToDepartmentStaff, removeEmployeeFromDepartmentStaff} =  require('./deparmentController')
 
@@ -17,6 +18,9 @@ employeeController = {
         })
 
         try {
+
+            const [department] = await Department.find({name: employee.department})
+            if (!department) throw new CustomError(`Department ${employee.department} does not exist`, 400)
             
             const savedDoc = await employee.save()
             await addEmployeeToDepartmentStaff(employee)
@@ -65,6 +69,9 @@ employeeController = {
         try {
             const employee = await Employee.findById(req.params.id)
             if (!employee) throw new CustomError("Employee not found", 404)
+            
+            const [department] = await Department.find({name: data.department})
+            if (!department) throw new CustomError(`Department ${data.department} does not exist`, 400)
 
             // update departmetns staff
             await removeEmployeeFromDepartmentStaff(employee)
