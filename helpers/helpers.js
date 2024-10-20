@@ -26,13 +26,6 @@ function objectsArrayToString(array) {
 
 
 
-function isObjectInArray(objId, array) {
-    const res = array.filter((employeeInfo) => {employeeInfo._id == objId})
-    if (res.length === 0) return false
-    return true
-}
-
-
 //Log functions
 function logAPICall(req, controllerName) {
     Logger.log(`[api_server] ${localTime()} ${req.method} v${req.httpVersion} ${req.baseUrl + req.url} @${controllerName}`)
@@ -62,4 +55,4 @@ function logMongoose(collectionName, methodName, ...methodArgs) {
     Logger.log(`[${'mongoose'.padEnd('api_server'.length)}] ${localTime()} ${collectionName}.${methodName}(${objectsArrayToString(methodArgs)})`)
 }
 
-module.exports = {logAPICall, logMongoose, logPrivateFunction, logInfo, isObjectInArray, logWarning}
+module.exports = {logAPICall, logMongoose, logPrivateFunction, logInfo, logWarning}
