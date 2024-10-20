@@ -162,10 +162,6 @@ async function removeDepartmentFromEmployee(departmentStaff) {
                 }
             )
 
-            if (infoOp.modifiedCount != 1) {
-                throw new Error(`Error updating employee profile from staff, id: ${employeeRef._id}`);
-                
-            }
         }
     } catch (error) {
         throw error
