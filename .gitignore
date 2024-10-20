@@ -1,2 +1,4 @@
 /node_modules
-Esquemas_Datos.key
+.env
+.DS_Store
+/logs
