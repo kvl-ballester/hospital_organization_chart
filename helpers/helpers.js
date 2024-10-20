@@ -1,7 +1,7 @@
 const Logger = require('./logger')
 
 function localTime() {
-    return new Date(Date.now()).toLocaleString()
+    return new Date(Date.now()).toLocaleString("sv-SE")
 }
 
 function isObjectEmpty(obj) {
