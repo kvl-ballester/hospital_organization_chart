@@ -1,5 +1,5 @@
 const CustomError = require('../helpers/customErrorClass')
-const { logAPICall, logPrivateFunction } = require('../helpers/helpers')
+const { logAPICall } = require('../helpers/helpers')
 const Logger = require('../helpers/logger')
 const Department = require('../models/department')
 const Employee = require('../models/employee')
@@ -63,20 +63,25 @@ employeeController = {
     updateEmployee: async (req, res) => {
         logAPICall(req, employeeController.updateEmployee.name)
         
-        const data = req.body
-        data._id = req.params.id
 
         try {
             const employee = await Employee.findById(req.params.id)
             if (!employee) throw new CustomError("Employee not found", 404)
             
-            const [department] = await Department.find({name: data.department})
-            if (!department) throw new CustomError(`Department ${data.department} does not exist`, 400)
-
+            const [department] = await Department.find({name: req.body.department})
+            if (!department) throw new CustomError(`Department ${req.body.department} does not exist`, 400)
+            
+            // new data
+            const data =  new Employee({
+                _id: req.params.id,
+                name: req.body.name,
+                surname: req.body.surname,
+                department: req.body.department
+            })
             // update departmetns staff
             await removeEmployeeFromDepartmentStaff(employee)
             await addEmployeeToDepartmentStaff(data)
-            await updateEmployee(data)
+            await Employee.updateOne({_id: data._id}, data)
 
             res.sendStatus(200)
 
@@ -95,7 +100,7 @@ employeeController = {
             if (!employee) throw new CustomError("Employee not found", 404)
 
             await removeEmployeeFromDepartmentStaff(employee)
-            await deleteEmployee(req.params.id)
+            await Employee.deleteOne({_id: req.params.id})
 
             res.sendStatus(200)
         } catch (error) {
@@ -106,42 +111,5 @@ employeeController = {
 
 }
 
-
-
-async function updateEmployee(data) {
-    logPrivateFunction(updateEmployee.name, data)
-
-    try {
-        const infoOp = await Employee.updateOne({_id: data._id}, data)
-        if (infoOp.modifiedCount != 1) {
-            throw new Error("Error occured updating employee info");
-            
-        } 
-
-        return infoOp
-
-    } catch (error) {
-        throw error
-    }
-    
-}
-
-async function deleteEmployee(id) {
-    logPrivateFunction(deleteEmployee.name, id)
-
-    try {
-        const infoOp = await Employee.deleteOne({_id: id})
-        if (infoOp.deletedCount != 1) {
-            throw new Error("An error ocurred while deleting employee");
-        }
-
-        return infoOp
-
-    } catch (error) {
-        throw error;
-        
-    }
-    
-}
 
 module.exports = {employeeController}

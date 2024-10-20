@@ -1,6 +1,6 @@
 const Department = require('../models/department')
 const Employee = require('../models/employee')
-const {logAPICall, logPrivateFunction, isObjectInArray, logWarning} = require('../helpers/helpers')
+const {logAPICall, logPrivateFunction, logWarning} = require('../helpers/helpers')
 const CustomError = require('../helpers/customErrorClass')
 const Logger = require('../helpers/logger')
 
@@ -87,7 +87,7 @@ async function addEmployeeToDepartmentStaff(employee) {
         const [department] = await Department.find({name: employee.department})
         let res = {}
 
-        if (isObjectInArray(employee._id, department.staff)) {
+        if (isEmployeeInStaff(employee._id, department.staff)) {
             logWarning(`Employee ${employee._id} is already in department ${employee.department}.`)
         } else {
             const data= {
@@ -101,16 +101,6 @@ async function addEmployeeToDepartmentStaff(employee) {
                     {staff: data}
                 }
             )
-    
-            if (infoOp.matchedCount != 1) {
-                throw new CustomError(`Department ${employee.department} does not exist`, 400);
-                
-            }
-    
-            if (infoOp.modifiedCount != 1) {
-                throw new Error(`Could assign employee ${data.fullname} to department ${employee.department}`);
-                
-            }
 
             res = infoOp
         }
@@ -132,7 +122,7 @@ async function removeEmployeeFromDepartmentStaff(employee) {
 
         if (!department) {
             logWarning(`No need to remove employee from staff, department ${employee.department} does not exist.`)
-        } else if (!isObjectInArray(employee._id, department.staff)){
+        } else if (!isEmployeeInStaff(employee._id, department.staff)){
             logWarning(`Employee ${employee._id} is not already in staff from department ${employee.department}`)
 
         } else {
@@ -145,10 +135,6 @@ async function removeEmployeeFromDepartmentStaff(employee) {
                     }
                 }
             )
-
-            if (infoOp.modifiedCount != 1) {
-                throw new Error(`Could remove employee ${employee._id} from department ${employee.department}`);
-            }
 
             res = infoOp
         }
@@ -185,6 +171,12 @@ async function removeDepartmentFromEmployee(departmentStaff) {
         throw error
     }
     
+}
+
+function isEmployeeInStaff(employeeId, staff) {
+    const res = staff.filter((obj) => obj._id.equals(employeeId))
+    if (res.length === 0) return false
+    return true
 }
 
 
