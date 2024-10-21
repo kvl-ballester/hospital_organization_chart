@@ -4,8 +4,10 @@ const { logMongoose, logInfo } = require("../helpers/helpers");
 mongoose.set('debug', logMongoose);
 
 const connectDB = async () => {
+  const mongoURI = process.env.MONGO_DB_URI || "mongodb://localhost:27017/hospital_db"
   try {
-    await mongoose.connect("mongodb://localhost:27017/hospital_db");
+    logInfo(`Connecting to ${mongoURI}`)
+    await mongoose.connect(mongoURI);
     logInfo('MongoDB connected')
   } catch (error) {
     console.error(error);
