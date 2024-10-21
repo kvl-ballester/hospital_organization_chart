@@ -26,8 +26,15 @@ departmentController = {
 
     getAllDepartments: async (req, res) => {
         logAPICall(req, departmentController.getAllDepartments.name)
-        const departments = await Department.find()
-        res.json(departments)
+
+        try {
+            const departments = await Department.find()
+            res.json(departments)
+        } catch (error) {
+            res.status(error.statusCode || 500).send(error.message)
+            Logger.log(error)
+        }
+        
 
     },
 
