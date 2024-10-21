@@ -20,6 +20,6 @@ app.use(bodyParser.json())
 app.use("/api/employee", employeeRouter);
 app.use("/api/department", departmentRouter);
 
-app.listen(port, '0.0.0.0', () => {
-    Logger.log(`[api_server] Server listening at http://0.0.0.0:${port}`)
-  });
+app.listen(port, () => {
+  Logger.log(`[api_server] Server listening at http://localhost:${port}`)
+});
