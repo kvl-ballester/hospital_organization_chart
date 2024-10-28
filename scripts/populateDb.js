@@ -22,16 +22,13 @@ async function createDepartments() {
     }
 }
 
-async function createStuff(departments) {
-    const departmentNames = departments.map(obj => obj.name)
+async function createStuff() {
     for (const person of data.people) {
-        let randomDepartmentIndex = Math.floor(Math.random() * departmentNames.length)
-        let departmentChosen = departmentNames[randomDepartmentIndex]
 
         const employeeDoc = new Employee({
             name: person.name,
             surname: person.surname,
-            department: departmentChosen
+            department: person.department
         })
 
         try {
@@ -39,7 +36,7 @@ async function createStuff(departments) {
             const savedDoc = await employeeDoc.save()
             // Add employee to department
             await Department.updateOne(
-                {name: departmentChosen},
+                {name: person.department},
                 {$push: 
                     {staff: {
                         _id: savedDoc._id,
@@ -57,7 +54,7 @@ async function createStuff(departments) {
 
 
 async function main() {
-    await connectTo(process.env.MONGO_DB_URI)
+    await connectTo(process.env.MONGO_DB_URI || 'mongodb://localhost:27017/clinic_db')
     let departments = await Department.find() 
     if (departments.length == 0) {
         await createDepartments();

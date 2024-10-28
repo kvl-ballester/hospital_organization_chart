@@ -9,11 +9,16 @@ const departments = [
 ]
 
 const people = [
-    {name: 'Alfred', surname: 'Christensen'},
-    {name: 'Francisco', surname: 'Willard'},
-    {name: 'Lisa', surname: 'Harris'},
-    {name: 'Constance', surname: 'Smith'},
-    {name: 'Leslie', surname: 'Roche'},
+    {name: 'Alfred', surname: 'Christensen', department: 'General Dentistry'},
+    {name: 'Francisco', surname: 'Willard', department: 'Pediatric Dentistry'},
+    {name: 'Lisa', surname: 'Harris', department: 'Restorative Dentistry'},
+    {name: 'Constance', surname: 'Smith', department: 'Surgery'},
+    {name: 'Leslie', surname: 'Roche', department: 'Orthodontics'},
+    {name: 'John', surname: 'Dudley', department: 'General Dentistry'},
+    {name: 'Janet', surname: 'Doe', department: 'General Dentistry'},
+    {name: 'Sarah', surname: 'Alvarez', department: 'Pediatric Dentistry'},
+    {name: 'Danny', surname: 'Perez', department: 'Restorative Dentistry'},
+    {name: 'Travis', surname: 'Combs', department: 'Orthodontics'},
 ]
 
 module.exports = {departments, people}
